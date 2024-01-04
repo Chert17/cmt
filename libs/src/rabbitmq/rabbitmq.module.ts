@@ -2,7 +2,7 @@ import { DynamicModule, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { ClientProxyFactory, Transport } from '@nestjs/microservices';
 
-import { ConfigModule, EnvEnum } from '../config';
+import { ConfigModule } from '../config';
 import { RmqService } from './rabbitmq.service';
 
 interface RmqModuleOptions {
@@ -21,9 +21,9 @@ export class RmqModule {
         inject: [ConfigService],
         provide: name,
         useFactory: (config: ConfigService) => {
-          const user = config.get(EnvEnum.RABBITMQ_USER);
-          const pass = config.get(EnvEnum.RABBITMQ_PASS);
-          const host = config.get(EnvEnum.RABBITMQ_HOST);
+          const user = config.get('RABBITMQ_USER');
+          const pass = config.get('RABBITMQ_PASS');
+          const host = config.get('RABBITMQ_HOST');
           const queue = config.get(`RABBITMQ_${name}_QUEUE`);
 
           return ClientProxyFactory.create({

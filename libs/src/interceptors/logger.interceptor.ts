@@ -22,10 +22,10 @@ export class LoggerInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       tap(() => {
-        this.logger.log(`Executed ${clas} url ${url} method ${method}`);
+        this.logger.debug(`Executed ${clas} url ${url} method ${method}`);
       }),
       catchError((error) => {
-        this.logger.error(
+        this.logger.debug(
           `Error in ${clas} url ${url} method ${method}: ${error.message}`,
           error.stack,
         );
