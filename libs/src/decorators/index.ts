@@ -1,1 +1,1 @@
-export * from './try-catch.decorator';
+export * from './params';

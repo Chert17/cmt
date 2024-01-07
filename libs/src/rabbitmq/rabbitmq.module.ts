@@ -5,17 +5,13 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
 import { ConfigModule } from '../config';
 import { RmqService } from './rabbitmq.service';
 
-interface RmqModuleOptions {
-  name: string;
-}
-
 @Module({
   imports: [ConfigModule],
   providers: [RmqService],
   exports: [RmqService],
 })
 export class RmqModule {
-  static register({ name }: RmqModuleOptions): DynamicModule {
+  static register(name: string): DynamicModule {
     const providers = [
       {
         inject: [ConfigService],
@@ -30,7 +26,13 @@ export class RmqModule {
             transport: Transport.RMQ,
             options: {
               queue,
-              queueOptions: { durable: true },
+              queueOptions: {
+                durable: true,
+                arguments: {
+                  'x-max-retries': 3,
+                  'x-delivery-limit': 3,
+                },
+              },
               urls: [`amqp://${user}:${pass}@${host}`],
               noAck: true,
             },

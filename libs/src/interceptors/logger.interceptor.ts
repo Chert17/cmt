@@ -1,4 +1,3 @@
-// logging.interceptor.ts
 import {
   CallHandler,
   ExecutionContext,
@@ -27,7 +26,6 @@ export class LoggerInterceptor implements NestInterceptor {
       catchError((error) => {
         this.logger.debug(
           `Error in ${clas} url ${url} method ${method}: ${error.message}`,
-          error.stack,
         );
         return throwError(() => error);
       }),

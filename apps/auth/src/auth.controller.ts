@@ -8,7 +8,11 @@ import {
 } from '@nestjs/microservices';
 
 import { AuthService } from './auth.service';
-import { RegisterServiceDto } from './dto';
+import {
+  LoginServiceDto,
+  RecoveryPasswordServiceDto,
+  RegisterServiceDto,
+} from './dto';
 
 @Controller()
 export class AuthController {
@@ -18,13 +22,39 @@ export class AuthController {
   ) {}
 
   @MessagePattern('register')
-  async register(
-    @Payload() data: RegisterServiceDto,
+  public register(
+    @Payload() dto: RegisterServiceDto,
     @Ctx() context: RmqContext,
   ) {
-    const res = await this.authService.register(data);
     this.rmqService.ack(context);
-    return res;
+    return this.authService.register(dto);
+  }
+
+  @MessagePattern('login')
+  public login(@Payload() dto: LoginServiceDto, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.authService.login(dto);
+  }
+
+  @MessagePattern('refresh')
+  public refresh(@Payload() refreshToken: string, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.authService.refresh(refreshToken);
+  }
+
+  @MessagePattern('recovery')
+  public recovery(
+    @Payload() dto: RecoveryPasswordServiceDto,
+    @Ctx() context: RmqContext,
+  ) {
+    this.rmqService.ack(context);
+    return this.authService.recovery(dto);
+  }
+
+  @MessagePattern('logout')
+  public logout(@Payload() userId: string, @Ctx() context: RmqContext) {
+    this.rmqService.ack(context);
+    return this.authService.logout(userId);
   }
 }
 

@@ -6,7 +6,7 @@ import { RmqContext, RmqOptions, Transport } from '@nestjs/microservices';
 export class RmqService {
   constructor(private readonly config: ConfigService) {}
 
-  getOptions(name: string, noAck = false): RmqOptions {
+  public getOptions(name: string, noAck = false): RmqOptions {
     const user = this.config.get('RABBITMQ_USER');
     const pass = this.config.get('RABBITMQ_PASS');
     const host = this.config.get('RABBITMQ_HOST');
@@ -18,11 +18,17 @@ export class RmqService {
         urls: [`amqp://${user}:${pass}@${host}`],
         queue,
         noAck,
+        queueOptions: {
+          arguments: {
+            'x-max-retries': 3,
+            'x-delivery-limit': 3,
+          },
+        },
       },
     };
   }
 
-  ack(context: RmqContext) {
+  public ack(context: RmqContext) {
     const channel = context.getChannelRef();
     const originalMessage = context.getMessage();
     channel.ack(originalMessage);
