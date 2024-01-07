@@ -4,10 +4,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 
-export class ApiError {
-  field: string;
-  message: string;
-}
+import { ApiError } from '../helpers';
 
 const errorsFormat = (err: ValidationError[]) => {
   const errors: ApiError[] = [];

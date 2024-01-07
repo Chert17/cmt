@@ -6,6 +6,13 @@ import {
   RegisterViewDto,
 } from '@app/auth/src/dto';
 import {
+  ApiLogin,
+  ApiLogout,
+  ApiRecovery,
+  ApiRefresh,
+  ApiRegister,
+} from '@app/auth/src/swagger';
+import {
   JwtAuthGuard,
   LoggerInterceptor,
   MulterFileType,
@@ -37,6 +44,7 @@ export class AuthGateway {
   constructor(@Inject('AUTH') private readonly authService: ClientProxy) {}
 
   @Post('/registration')
+  @ApiRegister()
   @UseInterceptors(FileInterceptor('avatar'))
   @HttpCode(HttpStatus.OK)
   public async register(
@@ -49,6 +57,7 @@ export class AuthGateway {
   }
 
   @Post('/login')
+  @ApiLogin()
   @UseInterceptors(SetRefreshTokenToCookieInterceptor)
   @HttpCode(HttpStatus.OK)
   public async login(@Body() dto: LoginDto) {
@@ -56,6 +65,7 @@ export class AuthGateway {
   }
 
   @Post('/refresh-token')
+  @ApiRefresh()
   @UseGuards(RefreshAuthGuard)
   @UseInterceptors(SetRefreshTokenToCookieInterceptor)
   @HttpCode(HttpStatus.OK)
@@ -67,6 +77,7 @@ export class AuthGateway {
   }
 
   @Post('recovery-password')
+  @ApiRecovery()
   @HttpCode(HttpStatus.OK)
   recovery(@Body() dto: RecoveryPasswordDto) {
     return lastValueFrom<RegisterViewDto>(
@@ -75,6 +86,7 @@ export class AuthGateway {
   }
 
   @Post('/logout')
+  @ApiLogout()
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
   public async logout(
