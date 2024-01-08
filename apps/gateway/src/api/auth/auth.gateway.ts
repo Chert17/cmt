@@ -15,8 +15,6 @@ import {
 import {
   JwtAuthGuard,
   LoggerInterceptor,
-  MulterFileType,
-  PhotoPipe,
   RefreshAuthGuard,
   ReqUserId,
   SetRefreshTokenToCookieInterceptor,
@@ -30,12 +28,10 @@ import {
   Post,
   Req,
   Res,
-  UploadedFile,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { lastValueFrom } from 'rxjs';
 
 @Controller('auth')
@@ -45,14 +41,10 @@ export class AuthGateway {
 
   @Post('/registration')
   @ApiRegister()
-  @UseInterceptors(FileInterceptor('avatar'))
   @HttpCode(HttpStatus.OK)
-  public async register(
-    @Body() dto: RegisterDto,
-    @UploadedFile(new PhotoPipe()) avatar: MulterFileType,
-  ) {
+  public async register(@Body() dto: RegisterDto) {
     return lastValueFrom<RegisterViewDto>(
-      this.authService.send('register', { ...dto, avatar }),
+      this.authService.send('register', dto),
     );
   }
 

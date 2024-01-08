@@ -1,20 +1,15 @@
-import { UploadDto } from '@app/file/src/dto';
 import { JwtService, RpcException } from '@lib/src';
 import {
   ForbiddenException,
-  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
 import { compare, genSalt, hash } from 'bcrypt';
 import { randomUUID } from 'crypto';
 import { Types } from 'mongoose';
-import { extname } from 'path';
-import { lastValueFrom } from 'rxjs';
 
 import {
   LoginServiceDto,
@@ -32,34 +27,22 @@ export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly authRepo: AuthRepo,
-    @Inject('FILE') private readonly fileService: ClientProxy,
   ) {}
 
   public async register(dto: RegisterServiceDto): Promise<RegisterViewDto> {
     try {
-      const { username, password, avatar } = dto;
+      const { username, password } = dto;
       const privateKey = randomUUID();
-      const _id = new Types.ObjectId();
 
       const userData: RegisterRepoDto = {
-        _id,
         username,
         password: await hash(password, await genSalt(10)),
         privateKey: await hash(privateKey, await genSalt(10)),
-        avatar: avatar && `${_id}${extname(avatar.originalname)}`,
       };
 
-      await this.authRepo.create(userData);
+      const user = await this.authRepo.create(userData);
 
-      const fileData: UploadDto = {
-        file: avatar,
-        folder: 'avatar',
-        filename: _id.toString(),
-      };
-
-      await lastValueFrom(this.fileService.send('upload', fileData));
-
-      return { privateKey, id: _id.toString() };
+      return { privateKey, id: user._id.toString() };
     } catch (error) {
       this.logger.debug(error);
       RpcException(InternalServerErrorException, error);

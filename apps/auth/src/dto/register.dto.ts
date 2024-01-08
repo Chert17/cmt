@@ -1,20 +1,13 @@
-import {
-  ExistUserByName,
-  MulterFileType,
-  passwordRegex,
-  usernameRegex,
-} from '@lib/src';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ExistUserByName, passwordRegex, usernameRegex } from '@lib/src';
+import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import {
   IsNotEmpty,
-  IsOptional,
   IsString,
   Length,
   Matches,
   Validate,
 } from 'class-validator';
-import { Types } from 'mongoose';
 
 export class RegisterDto {
   @ApiProperty({
@@ -44,24 +37,11 @@ export class RegisterDto {
   @Length(8)
   @Transform(({ value }) => value.trim())
   password: string;
-
-  @ApiPropertyOptional({
-    description: 'user avatar photo',
-    type: 'string',
-    format: 'binary',
-    required: false,
-  })
-  @IsOptional()
-  avatar?: MulterFileType;
 }
 
 export class RegisterServiceDto extends RegisterDto {}
 
-export class RegisterRepoDto {
-  _id: Types.ObjectId;
-  username: string;
-  password: string;
-  avatar?: string;
+export class RegisterRepoDto extends RegisterServiceDto {
   privateKey: string;
 }
 
